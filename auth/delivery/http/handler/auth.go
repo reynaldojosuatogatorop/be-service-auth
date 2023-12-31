@@ -86,6 +86,11 @@ func (ah *AuthHandler) Login(c *fiber.Ctx) (err error) {
 			log.Error("Password not match")
 			return c.SendStatus(fasthttp.StatusUnauthorized)
 		}
+
+		if err.Error() == "Forbidden" {
+			log.Error("Forbidden")
+			return c.SendStatus(fasthttp.StatusForbidden)
+		}
 		return helper.HttpSimpleResponse(c, fasthttp.StatusInternalServerError)
 
 	}

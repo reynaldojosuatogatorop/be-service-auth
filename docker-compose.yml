@@ -1,14 +1,15 @@
 version: '3'
 
 services:
-  adminer:
-    image: adminer
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
     ports:
-      - "8080:8080"
+      - "8080:80"
     networks:
-      - Apps-Service-Dependencies
+      - Apps-Service-Dependencies-Cms
     environment:
-      - ADMINER_DEFAULT_SERVER=mariadb
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mariadb
     depends_on:
       - mariadb
 
@@ -20,14 +21,14 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - Apps-Service-Dependencies
+      - Apps-Service-Dependencies-Cms
 
   redis-containers:
     image: redis:7.0.12
     ports:
       - "6379:6379"
     networks:
-      - Apps-Service-Dependencies
+      - Apps-Service-Dependencies-Cms
 
   be-service-auth-container:
     image: reynaldojosuatogatorop/be-service-auth:dev
@@ -39,7 +40,7 @@ services:
       # - emqx
       - minio
     networks:
-      - Apps-Service-Dependencies
+      - Apps-Service-Dependencies-Cms
     environment:
       - SERVER_PORT=8882
       - SERVER_PREFORK=false
@@ -56,10 +57,10 @@ services:
       - SERVER_SESSIONEXPIRE=3600
       - DATABASE_HOST=mariadb
       - DATABASE_PORT=3306
-      - DATABASE_NAME=auth
+      - DATABASE_DATABASE=auth
       - DATABASE_USER=root
       - DATABASE_PASSWORD=12345
-      - DATABASE_PATH_MIGRATE=file://db/migration
+      - DATABASE_PATH_MIGRATE=file://db/migration/migration
       - DATABASE_SSLOPTIONS_SSLMODE=disable
       - REDIS_HOST=redis-containers
       - REDIS_PORT=6379
@@ -79,7 +80,7 @@ services:
     ports:
       - "8884:8080"
     networks:
-      - Apps-Service-Dependencies
+      - Apps-Service-Dependencies-Cms
     environment:
       - SWAGGER_JSON=/app/openapi.yaml
     volumes:
@@ -95,7 +96,7 @@ services:
   #     - "8084:8084"
   #     - "18083:18083"
   #   networks:
-  #     - Apps-Service-Dependencies
+  #     - Apps-Service-Dependencies-Cms
 
   # mqttx-web:
   #   container_name: mqttx-webs
@@ -103,7 +104,7 @@ services:
   #   ports:
   #     - "80:80"
   #   networks:
-  #     - Apps-Service-Dependencies
+  #     - Apps-Service-Dependencies-Cms
 
   minio:
     image: quay.io/minio/minio
@@ -111,7 +112,7 @@ services:
       - "9000:9000"
       - "9090:9090"
     networks:
-      - Apps-Service-Dependencies
+      - Apps-Service-Dependencies-Cms
     volumes:
       - D:\minio\data:/data
     environment:
@@ -120,4 +121,4 @@ services:
     command: server /data --console-address ":9090"
 
 networks:
-  Apps-Service-Dependencies:
+  Apps-Service-Dependencies-Cms:
