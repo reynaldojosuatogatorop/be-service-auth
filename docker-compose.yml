@@ -1,0 +1,123 @@
+version: '3'
+
+services:
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    networks:
+      - Apps-Service-Dependencies
+    environment:
+      - ADMINER_DEFAULT_SERVER=mariadb
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: auth
+    ports:
+      - "3306:3306"
+    networks:
+      - Apps-Service-Dependencies
+
+  redis-containers:
+    image: redis:7.0.12
+    ports:
+      - "6379:6379"
+    networks:
+      - Apps-Service-Dependencies
+
+  be-service-auth-container:
+    image: reynaldojosuatogatorop/be-service-auth:dev
+    ports:
+      - "8882:8882"
+    depends_on:
+      - mariadb
+      - redis-containers
+      # - emqx
+      - minio
+    networks:
+      - Apps-Service-Dependencies
+    environment:
+      - SERVER_PORT=8882
+      - SERVER_PREFORK=false
+      - SERVER_STRICTROUTING=false
+      - SERVER_CASESENSITIVE=false
+      - SERVER_BODYLIMIT=4194304
+      - SERVER_CONCURRENCY=262144
+      - SERVER_TIMEOUT_READ=5
+      - SERVER_TIMEOUT_WRITE=10
+      - SERVER_TIMEOUT_IDLE=120
+      - SERVER_LOGLEVEL=debug
+      - SERVER_GRPCPORT=58882
+      - SERVER_BASEPATH=
+      - SERVER_SESSIONEXPIRE=3600
+      - DATABASE_HOST=mariadb
+      - DATABASE_PORT=3306
+      - DATABASE_NAME=auth
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=12345
+      - DATABASE_PATH_MIGRATE=file://db/migration
+      - DATABASE_SSLOPTIONS_SSLMODE=disable
+      - REDIS_HOST=redis-containers
+      - REDIS_PORT=6379
+      - REDIS_MAXCONNECTION=80
+      - REDIS_USERNAME=
+      - REDIS_PASSWORD=
+      - REDIS_DATABASE=0
+      - MESSAGE_BROKER_HOST=emqx
+      - MESSAGE_BROKER_PORT=1883
+      - BUCKET_CREDENTIAL_ACCESS_KEY=ROOTUSER
+      - BUCKET_CREDENTIAL_SECRET_KEY=CHANGEME123
+      - BUCKET_CREDENTIAL_DOMAIN=http://minio:9000
+      - BUCKET_CREDENTIAL_REGION=ap-southeast-1
+
+  swagger-ui-container:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8884:8080"
+    networks:
+      - Apps-Service-Dependencies
+    environment:
+      - SWAGGER_JSON=/app/openapi.yaml
+    volumes:
+      - ./openapi.yaml:/app/openapi.yaml
+
+  # emqx:
+  #   image: emqx/emqx:v4.0.0
+  #   ports:
+  #     - "1883:1883"
+  #     - "8081:8081"
+  #     - "8083:8083"
+  #     - "8883:8883"
+  #     - "8084:8084"
+  #     - "18083:18083"
+  #   networks:
+  #     - Apps-Service-Dependencies
+
+  # mqttx-web:
+  #   container_name: mqttx-webs
+  #   image: emqx/mqttx-web
+  #   ports:
+  #     - "80:80"
+  #   networks:
+  #     - Apps-Service-Dependencies
+
+  minio:
+    image: quay.io/minio/minio
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    networks:
+      - Apps-Service-Dependencies
+    volumes:
+      - D:\minio\data:/data
+    environment:
+      - MINIO_ROOT_USER=ROOTUSER
+      - MINIO_ROOT_PASSWORD=CHANGEME123
+    command: server /data --console-address ":9090"
+
+networks:
+  Apps-Service-Dependencies:
