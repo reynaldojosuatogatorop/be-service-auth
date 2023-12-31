@@ -21,7 +21,8 @@ type ResponseLoginDTO struct {
 
 type AuthUseCase interface {
 	Login(ctx context.Context, request LoginRequestDTO) (response ResponseLoginDTO, err error)
-	// Logout(ctx context.Context, token string) (err error)
+	AuthorizeAuth(ctx context.Context, request string) (response ResponseLoginDTO, err error)
+	Logout(ctx context.Context, token string) (err error)
 }
 
 type AuthMySQLRepo interface {

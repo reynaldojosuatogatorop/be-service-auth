@@ -24,7 +24,7 @@ func RouterAPI(app *fiber.App, Auth domain.AuthUseCase) {
 
 	// Authentication & Authorization Route
 	cms.Post("/login", handlerAuth.Login)
-	// cms.Get("/auth", handlerAuth.AuthorizationAuth(), handlerAuth.Auth)
-	// cms.Post("/logout", handlerAuth.AuthorizationAuth(), handlerAuth.Logout)
+	cms.Get("/auth", handlerAuth.AuthorizationAuth(), handlerAuth.Auth)
+	cms.Post("/logout", handlerAuth.AuthorizationAuth(), handlerAuth.Logout)
 
 }

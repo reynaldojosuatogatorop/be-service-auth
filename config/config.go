@@ -55,6 +55,8 @@ type Server struct {
 
 	// BasePath is router base path
 	BasePath string `yaml:"base_path"`
+
+	SessionExpire int `yaml:"session_expire"`
 }
 
 type Timeout struct {
@@ -139,9 +141,10 @@ var defaultConfig = &Config{
 			Write: 10,
 			Idle:  120,
 		},
-		LogLevel: "debug",
-		GRPCPort: "58882",
-		BasePath: "",
+		LogLevel:      "debug",
+		GRPCPort:      "58882",
+		BasePath:      "",
+		SessionExpire: 3600,
 	},
 
 	Database: Database{
@@ -151,9 +154,6 @@ var defaultConfig = &Config{
 		User:        "root",
 		Password:    "perindo",
 		PathMigrate: "file:../db/migration",
-		// Options: OptionSSLDB{
-		// 	SSLMode: "disable",
-		// },
 	},
 
 	Redis: Redis{

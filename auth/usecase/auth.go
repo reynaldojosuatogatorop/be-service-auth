@@ -79,5 +79,22 @@ func (au *authUsecase) Login(ctx context.Context, req domain.LoginRequestDTO) (s
 		return
 	}
 	return
+}
+
+func (au *authUsecase) AuthorizeAuth(ctx context.Context, token string) (authorization domain.ResponseLoginDTO, err error) {
+	authorization, err = au.authRedisRepo.GetAuth(ctx, token)
+	if err != nil {
+		err = errors.New("user only")
+		return
+	}
+
+	return
+}
+
+func (au *authUsecase) Logout(ctx context.Context, token string) (err error) {
+	err = au.authRedisRepo.DeleteSession(ctx, token)
+	if err != nil {
+		log.Info(err)
+	}
 	return
 }

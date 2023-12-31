@@ -21,6 +21,52 @@ func NewRedisAuthRepository(Conn *redis.Client) domain.AuthRedisRepo {
 	return &redisAuthRepository{Conn}
 }
 
+// Login session dont have expired time
+func (r *redisAuthRepository) CreateSession(ctx context.Context, user domain.ResponseLoginDTO, token string) (session domain.ResponseLoginDTO, err error) {
+	// Use pipeline to execute multiple commands in a single round trip
+	pipe := r.Conn.Pipeline()
+
+	now := time.Now()
+	sessionExpire := time.Duration(viper.GetInt("server.session_expire")) * time.Second
+
+	log.Print(viper.GetInt("server.session_expire"))
+	session = domain.ResponseLoginDTO{
+		Token:           token,
+		ID:              user.ID,
+		Email:           user.Email,
+		Role:            user.Role,
+		ExpiredDatetime: now.Add(sessionExpire),
+	}
+
+	sessionData := map[string]interface{}{
+		"Token":   token,
+		"ID":      user.ID,
+		"Email":   user.Email,
+		"Role":    user.Role,
+		"Expired": session.ExpiredDatetime.Format(time.RFC3339), // Convert time to string
+	}
+
+	// Set session data and expire for email
+	log.Printf("HMSET %s: %v", session.Email, sessionData)
+	pipe.HMSet(ctx, session.Email, sessionData)
+	pipe.Expire(ctx, session.Email, sessionExpire)
+
+	// Set token and expire
+	log.Printf("SET %s %s", token, session.Email)
+	pipe.Set(ctx, token, session.Email, sessionExpire)
+	pipe.Expire(ctx, token, sessionExpire)
+
+	// Execute all commands in the pipeline
+	log.Info("Executing Redis pipeline...")
+	_, err = pipe.Exec(ctx)
+	if err != nil {
+		log.Errorf("Error executing Redis pipeline: %v", err)
+		return domain.ResponseLoginDTO{}, err
+	}
+
+	return
+}
+
 func (r *redisAuthRepository) getToken(ctx context.Context, token string) (session domain.ResponseLoginDTO, err error) {
 	log.Debug("Get session token " + token)
 	data := r.Conn.Get(ctx, token)
@@ -78,44 +124,6 @@ func (r *redisAuthRepository) DeleteSession(ctx context.Context, token string) (
 	if res == 0 {
 		return errors.New("not found")
 	}
-
-	return
-}
-
-// Login session dont have expired time
-func (r *redisAuthRepository) CreateSession(ctx context.Context, user domain.ResponseLoginDTO, token string) (session domain.ResponseLoginDTO, err error) {
-	// var params []interface{}
-	now := time.Now()
-	sessionExpire := time.Duration(viper.GetInt("server.session_expire")) * time.Second
-
-	log.Print(viper.GetInt("server.session_expire"))
-	session = domain.ResponseLoginDTO{
-		Token:           token,
-		ID:              user.ID,
-		Email:           user.Email,
-		Role:            user.Role,
-		ExpiredDatetime: now.Add(sessionExpire),
-	}
-
-	sessionData := map[string]interface{}{
-		"Token":   token,
-		"ID":      user.ID,
-		"Email":   user.Email,
-		"Role":    user.Role,
-		"Expired": session.ExpiredDatetime,
-	}
-
-	// store data using SET command
-	pipe := r.Conn.Pipeline()
-
-	// Simpan data sesi dalam Redis menggunakan HSet
-	r.Conn.HMSet(ctx, session.Email, sessionData)
-	r.Conn.Expire(ctx, session.Email, sessionExpire)
-
-	// Simpan token ke kunci sesi
-	r.Conn.Set(ctx, token, session.Email, sessionExpire)
-	r.Conn.Expire(ctx, token, sessionExpire)
-	_, err = pipe.Exec(ctx)
 
 	return
 }
