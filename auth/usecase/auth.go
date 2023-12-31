@@ -47,7 +47,7 @@ func (au *authUsecase) Login(ctx context.Context, req domain.LoginRequestDTO) (s
 	}
 
 	if res.Role != "admin" {
-		err = errors.New("Forbideen")
+		err = errors.New("Forbidden")
 		return
 	}
 

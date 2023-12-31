@@ -9,6 +9,8 @@ import (
 	"net"
 	"strconv"
 
+	_RepoGRPCAuthObject "be-service-auth/auth/delivery/grpc"
+	_RepoGRPCAuthServer "be-service-auth/auth/delivery/grpc/authorization"
 	_DeliveryHTTP "be-service-auth/auth/delivery/http"
 	_RepoMySQLAuth "be-service-auth/auth/repository/mysql"
 	_RepoRedisAuth "be-service-auth/auth/repository/redis"
@@ -121,7 +123,7 @@ func main() {
 	repoMySQLAuth := _RepoMySQLAuth.NewMySQLAuthRepository(dbConn)
 	repoRedisAuth := _RepoRedisAuth.NewRedisAuthRepository(dbRedis)
 	usecaseAuth := _UsecaseAuth.NewAuthUsecase(repoMySQLAuth, repoRedisAuth)
-
+	serverAuth := _RepoGRPCAuthObject.NewGRPCAuth(usecaseAuth)
 	// Initialize gRPC server
 	go func() {
 		listen, err := net.Listen("tcp", ":"+viper.GetString("server.grpc_port"))
@@ -130,7 +132,7 @@ func main() {
 		}
 
 		grpcServer := grpc.NewServer()
-
+		_RepoGRPCAuthServer.RegisterAuthorizationServiceServer(grpcServer, serverAuth)
 		log.Println("gRPC server is running in port", viper.GetString("server.grpc_port"))
 		if err := grpcServer.Serve(listen); err != nil {
 			log.Fatalf("Failed to serve: %v", err)

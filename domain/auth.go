@@ -35,3 +35,7 @@ type AuthRedisRepo interface {
 	DeleteSession(ctx context.Context, token string) (err error)
 	GetAuth(ctx context.Context, token string) (session ResponseLoginDTO, err error)
 }
+
+type AuthGRPCRepo interface {
+	GetFromAuth(ctx context.Context, token string) (response ResponseLoginDTO, err error)
+}
