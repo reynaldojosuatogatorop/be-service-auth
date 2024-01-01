@@ -128,7 +128,10 @@ services:
     environment:
       - SWAGGER_JSON=/app/openapi.yaml
     volumes:
-      - ./openapi.yaml:/app/openapi.yaml
+      - ./openapi.yaml:/app/openapi.yaml  # Volume untuk file OpenAPI
+
+      # Tambahkan volume untuk file OpenAPI dari container lain (misalnya, be-service-auth-container)
+      - ./openapi-auth.yaml:/app/openapi-auth.yaml
 
   minio:
     image: quay.io/minio/minio
