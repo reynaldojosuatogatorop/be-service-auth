@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Open API for CMS Backend
-  description: Open API for CMS Backend
+  title: Open API for Auth CMS Backend
+  description: Open API for Auth CMS Backend
   version: 1.0.0
 
 servers:
