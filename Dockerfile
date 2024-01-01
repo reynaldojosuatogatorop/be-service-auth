@@ -15,5 +15,5 @@ RUN apk add --no-cache tzdata
 WORKDIR /app/
 COPY --from=builder /go/src/be-service-auth/be-service-auth .
 COPY --from=builder /go/src/be-service-auth/db ./db/migration
-COPY openapi.yaml /app/openapi-auth.yaml
+COPY /openapi-submodule/openapi-auth.yaml /app/openapi-auth.yaml
 CMD ["./be-service-auth"]
