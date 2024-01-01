@@ -10,12 +10,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o be-service-auth a
 FROM alpine:latest
 EXPOSE 8882
 
-# Install Git
-RUN apk --no-cache add git
-
-RUN apk --no-cache add ca-certificates tzdata
+RUN apk --no-cache add ca-certificates
+RUN apk add --no-cache tzdata
 WORKDIR /app/
 COPY --from=builder /go/src/be-service-auth/be-service-auth .
-COPY --from=builder /go/src/be-service-auth/db/migration ./db/migration
-COPY openapi-submodule/openapi-auth.yaml /app/openapi-auth.yaml
+COPY --from=builder /go/src/be-service-auth/db ./db/migration
+COPY openapi.yaml /app/openapi-auth.yaml
 CMD ["./be-service-auth"]
