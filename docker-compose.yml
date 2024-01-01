@@ -17,7 +17,7 @@ services:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_DATABASE: auth
+      MYSQL_DATABASE: auth, product
     ports:
       - "3306:3306"
     networks:
@@ -60,7 +60,51 @@ services:
       - DATABASE_DATABASE=auth
       - DATABASE_USER=root
       - DATABASE_PASSWORD=12345
-      - DATABASE_PATH_MIGRATE=file://db/migration/migration
+      - DATABASE_PATH_MIGRATE=file://db/migration
+      - DATABASE_SSLOPTIONS_SSLMODE=disable
+      - REDIS_HOST=redis-containers
+      - REDIS_PORT=6379
+      - REDIS_MAXCONNECTION=80
+      - REDIS_USERNAME=
+      - REDIS_PASSWORD=
+      - REDIS_DATABASE=0
+      - MESSAGE_BROKER_HOST=emqx
+      - MESSAGE_BROKER_PORT=1883
+      - BUCKET_CREDENTIAL_ACCESS_KEY=ROOTUSER
+      - BUCKET_CREDENTIAL_SECRET_KEY=CHANGEME123
+      - BUCKET_CREDENTIAL_DOMAIN=http://minio:9000
+      - BUCKET_CREDENTIAL_REGION=ap-southeast-1
+  be-service-product-management-container:
+    image: reynaldojosuatogatorop/be-service-product-management:dev
+    ports:
+      - "8883:8883"
+    depends_on:
+      - mariadb
+      - redis-containers
+      # - emqx
+      - minio
+    networks:
+      - Apps-Service-Dependencies-Cms
+    environment:
+      - SERVER_PORT=8882
+      - SERVER_PREFORK=false
+      - SERVER_STRICTROUTING=false
+      - SERVER_CASESENSITIVE=false
+      - SERVER_BODYLIMIT=4194304
+      - SERVER_CONCURRENCY=262144
+      - SERVER_TIMEOUT_READ=5
+      - SERVER_TIMEOUT_WRITE=10
+      - SERVER_TIMEOUT_IDLE=120
+      - SERVER_LOGLEVEL=debug
+      - SERVER_GRPCPORT=58882
+      - SERVER_BASEPATH=
+      - SERVER_SESSIONEXPIRE=3600
+      - DATABASE_HOST=mariadb
+      - DATABASE_PORT=3306
+      - DATABASE_DATABASE=product
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=12345
+      - DATABASE_PATH_MIGRATE=file://db/migration
       - DATABASE_SSLOPTIONS_SSLMODE=disable
       - REDIS_HOST=redis-containers
       - REDIS_PORT=6379
@@ -85,26 +129,6 @@ services:
       - SWAGGER_JSON=/app/openapi.yaml
     volumes:
       - ./openapi.yaml:/app/openapi.yaml
-
-  # emqx:
-  #   image: emqx/emqx:v4.0.0
-  #   ports:
-  #     - "1883:1883"
-  #     - "8081:8081"
-  #     - "8083:8083"
-  #     - "8883:8883"
-  #     - "8084:8084"
-  #     - "18083:18083"
-  #   networks:
-  #     - Apps-Service-Dependencies-Cms
-
-  # mqttx-web:
-  #   container_name: mqttx-webs
-  #   image: emqx/mqttx-web
-  #   ports:
-  #     - "80:80"
-  #   networks:
-  #     - Apps-Service-Dependencies-Cms
 
   minio:
     image: quay.io/minio/minio
