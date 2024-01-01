@@ -17,7 +17,7 @@ services:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_DATABASE: auth, product
+      MYSQL_DATABASE: auth
     ports:
       - "3306:3306"
     networks:
@@ -128,10 +128,7 @@ services:
     environment:
       - SWAGGER_JSON=/app/openapi.yaml
     volumes:
-      - ./openapi.yaml:/app/openapi.yaml  # Volume untuk file OpenAPI
-
-      # Tambahkan volume untuk file OpenAPI dari container lain (misalnya, be-service-auth-container)
-      - ./openapi-auth.yaml:/app/openapi-auth.yaml
+      - ./openapi.yaml:/app/openapi.yaml
 
   minio:
     image: quay.io/minio/minio
