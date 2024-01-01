@@ -126,9 +126,9 @@ services:
     networks:
       - Apps-Service-Dependencies-Cms
     environment:
-      - SWAGGER_JSON=/app/openapi.yaml
+      - SWAGGER_JSON=/app/openapi/openapi-auth.yaml
     volumes:
-      - ./openapi.yaml:/app/openapi.yaml
+      - ./openapi-submodule/.:/app/openapi
 
   minio:
     image: quay.io/minio/minio
