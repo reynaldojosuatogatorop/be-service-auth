@@ -1,8 +1,10 @@
+image: golang:latest
+
 stages:
   - build
 
 variables:
-  BINARY_NAME: "be-service-auth"
+  BINARY_NAME: "myapp"
 
 build:
   stage: build
