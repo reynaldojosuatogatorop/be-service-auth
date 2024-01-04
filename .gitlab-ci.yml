@@ -16,16 +16,10 @@ building:
   stage: build
   script:
     - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
-    - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+    - rsync -av --exclude=".git" $CI_PROJECT_DIR/ $GOPATH/src/$REPO_NAME/
     - cd $GOPATH/src/$REPO_NAME
     - GOOS=linux GOARCH=amd64 go build -ldflags '-linkmode external -w -extldflags "-static"' -o ${PROJECT_NAME}
     - echo "Builded"
-  only:
-    - dev
-  artifacts:
-    paths:
-      - ${PROJECT_NAME}
-    expire_in: 5 min
 deploying:
   stage: deploy
   dependencies:
