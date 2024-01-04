@@ -15,7 +15,7 @@ before_script:
 build:
   stage: build
   script:
-    - go build -o $BINARY_NAME app/main.go
+    - go build -o $BINARY_NAME
   artifacts:
     paths:
       - $BINARY_NAME
