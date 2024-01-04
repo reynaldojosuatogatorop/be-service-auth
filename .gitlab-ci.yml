@@ -24,7 +24,7 @@ build:
 deploy:
   stage: deploy
   only:
-    - master
+    - dev
   script:
     - scp $BINARY_NAME $SERVER_USER@$SERVER_IP:$SERVER_PATH
     - ssh $SERVER_USER@$SERVER_IP 'sudo systemctl stop your-app-service'
