@@ -1,8 +1,12 @@
 stages:
   - build
+  - deploy
 
 variables:
-  BINARY_NAME: "be-service-auth"  # Ganti dengan nama binary yang sesuai dengan proyek Anda
+  BINARY_NAME: "be-service-auth"
+  SERVER_IP: "your-droplet-ip"
+  SERVER_USER: "your-server-username"
+  SERVER_PATH: "/path/to/remote/directory"
 
 before_script:
   - export GOPATH=$CI_PROJECT_DIR/go
@@ -12,7 +16,16 @@ build:
   stage: build
   script:
     - go build -o $BINARY_NAME app/main.go
+  artifacts:
+    paths:
+      - $BINARY_NAME
 
-artifacts:
-  paths:
-    - $BINARY_NAME
+deploy:
+  stage: deploy
+  only:
+    - dev
+  script:
+    - scp $BINARY_NAME $SERVER_USER@$SERVER_IP:$SERVER_PATH
+    - ssh $SERVER_USER@$SERVER_IP 'sudo systemctl stop your-app-service'
+    - ssh $SERVER_USER@$SERVER_IP 'mv $SERVER_PATH/$BINARY_NAME /path/to/your/app'
+    - ssh $SERVER_USER@$SERVER_IP 'sudo systemctl start your-app-service'
