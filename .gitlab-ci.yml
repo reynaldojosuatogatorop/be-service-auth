@@ -1,48 +1,13 @@
-image:
-  #golang:alpine
-  # myregistry.domain.com/ppi-golang:alpine
-variables:
-  PROJECT_NAME: be-service-auth
-  REPO_NAME: gitlab.com/luru-norton/be-service-auth
-  SSH_HOST: ${SSH_HOST_DEV}
-  SSH_USER: ${SSH_USER_DEV}
-  SSH_PRIVATE_KEY: ${SSH_PRIVATE_KEY_DEV}
-#before_script:
-#  - 'command -v ssh-agent > /dev/null || (apk update && apk add build-base && apk add git && apk add openssh-client && apk add --no-cache libc6-compat)'
 stages:
   - build
-  - deploy
-building:
+
+variables:
+  BINARY_NAME: "be-service-auth"
+
+build:
   stage: build
   script:
-    - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
-    - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
-    - cd $GOPATH/src/$REPO_NAME
-    - GOOS=linux GOARCH=amd64 go build -ldflags '-linkmode external -w -extldflags "-static"' -o ${PROJECT_NAME}
-    - echo "Builded"
-  only:
-    - dev
+    - go build -o $BINARY_NAME
   artifacts:
     paths:
-      - ${PROJECT_NAME}
-    expire_in: 5 min
-deploying:
-  stage: deploy
-  dependencies:
-    - building
-  script:
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo -n "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh-keyscan ${SSH_HOST} >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    # - scp service/database/mysql/migration/sql/* ${SSH_USER}@${SSH_HOST}:/usr/local/etc/be-service-auth-migrate-sql
-    - scp be-service-auth.yaml ${SSH_USER}@${SSH_HOST}:/usr/local/etc/${PROJECT_NAME}.yaml
-    - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "service ${PROJECT_NAME} stop"
-    - scp ./${PROJECT_NAME} ${SSH_USER}@${SSH_HOST}:/usr/local/bin
-    - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "service ${PROJECT_NAME} start"
-    - echo "Deployed"
-  only:
-    - dev
+      - $BINARY_NAME
