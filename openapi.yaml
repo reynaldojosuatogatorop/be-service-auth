@@ -7,6 +7,8 @@ info:
 servers:
   - url: http://localhost:8882
     description: "local development"
+  - url: http://128.199.206.202/auth
+    description: "staging development"
 
 paths:
   /login:
