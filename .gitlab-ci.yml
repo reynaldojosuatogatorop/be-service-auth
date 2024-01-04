@@ -3,7 +3,7 @@ stages:
   - deploy
 
 variables:
-  BINARY_NAME: "be-service-auth"
+  BINARY_NAME: "myapp"
   SERVER_IP: "your-droplet-ip"
   SERVER_USER: "your-server-username"
   SERVER_PATH: "/path/to/remote/directory"
@@ -15,6 +15,7 @@ before_script:
 build:
   stage: build
   script:
+    - apt-get update -qy && apt-get install -y golang
     - go build -o $BINARY_NAME
   artifacts:
     paths:
@@ -23,7 +24,7 @@ build:
 deploy:
   stage: deploy
   only:
-    - dev
+    - master
   script:
     - scp $BINARY_NAME $SERVER_USER@$SERVER_IP:$SERVER_PATH
     - ssh $SERVER_USER@$SERVER_IP 'sudo systemctl stop your-app-service'
