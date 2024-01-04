@@ -9,7 +9,7 @@ variables:
   SERVER_PATH: "/path/to/remote/directory"
 
 before_script:
-  - export GOPATH=$CI_PROJECT_DIR/app/main.go
+  - export GOPATH=$CI_PROJECT_DIR/go
   - export PATH=$GOPATH/bin:$PATH
 
 build:
