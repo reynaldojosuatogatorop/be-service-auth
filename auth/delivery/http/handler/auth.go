@@ -40,6 +40,9 @@ func (az *AuthHandler) AuthorizationAuth() fiber.Handler {
 		auth, err := az.authorizationAuth(c)
 
 		if err != nil {
+			if err.Error() == "Expired" {
+				return c.Status(fasthttp.StatusForbidden).SendString("Invalid token")
+			}
 			return helper.HttpSimpleResponse(c, fasthttp.StatusUnauthorized)
 		}
 
@@ -106,6 +109,9 @@ func (ah *AuthHandler) Auth(c *fiber.Ctx) (err error) {
 	session := c.Locals("session")
 
 	if err != nil {
+		if err.Error() == "Expired" {
+			return c.Status(fasthttp.StatusForbidden).SendString("Token invalid")
+		}
 		return c.SendString(err.Error())
 	}
 

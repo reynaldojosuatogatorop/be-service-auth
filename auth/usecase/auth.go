@@ -84,6 +84,10 @@ func (au *authUsecase) Login(ctx context.Context, req domain.LoginRequestDTO) (s
 func (au *authUsecase) AuthorizeAuth(ctx context.Context, token string) (authorization domain.ResponseLoginDTO, err error) {
 	authorization, err = au.authRedisRepo.GetAuth(ctx, token)
 	if err != nil {
+		if err.Error() == "Expired" {
+			err = errors.New(err.Error())
+			return domain.ResponseLoginDTO{}, err
+		}
 		err = errors.New("user only")
 		return
 	}

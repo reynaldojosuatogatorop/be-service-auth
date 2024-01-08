@@ -145,6 +145,11 @@ func (r *redisAuthRepository) GetAuth(ctx context.Context, token string) (respon
 		log.Error("Error convert expired")
 		return
 	}
+
+	if sessionExpire.Before(time.Now()) {
+		err = errors.New("Expired")
+		return domain.ResponseLoginDTO{}, err
+	}
 	ID, err := strconv.Atoi(res["ID"])
 	if err != nil {
 		return
