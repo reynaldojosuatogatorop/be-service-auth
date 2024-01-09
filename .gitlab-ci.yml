@@ -15,8 +15,6 @@ stages:
   - build
   - deploy
 
-# ... (Bagian lain dari konfigurasi)
-
 build-old:
   stage: build
   cache:
