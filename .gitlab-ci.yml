@@ -3,16 +3,17 @@ stages:
 
 variables:
   GO111MODULE: "on"
+  GO_VERSION: "1.19"
 
 before_script:
-  - apt-get update -qy  # Mengupdate paket pada environment Docker
-  - apt-get install -y golang  # Menginstal Golang
-
-  - go mod download
+  - apt-get update -qy
+  - apt-get install -y golang-${GO_VERSION}
+  - go version
 
 build:
   stage: build
   script:
+    - go mod download
     - go mod tidy
     - go build -o app main.go
   artifacts:
