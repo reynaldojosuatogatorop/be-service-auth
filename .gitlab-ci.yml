@@ -5,7 +5,7 @@ variables:
   GO111MODULE: "on"
 
 before_script:
-  - go mod download
+  - go mod tidy
 
 build:
   stage: build
