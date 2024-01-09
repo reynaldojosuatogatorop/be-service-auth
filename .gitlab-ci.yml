@@ -4,17 +4,18 @@ variables:
   SSH_HOST: ${SSH_HOST_DEV}
   SSH_USER: ${SSH_USER_DEV}
   SSH_PRIVATE_KEY: ${SSH_PRIVATE_KEY_DEV}
-#before_script:
-#  - 'command -v ssh-agent > /dev/null || (apk update && apk add build-base && apk add git && apk add openssh-client && apk add --no-cache libc6-compat)'
+
 stages:
   - build
-  #- deploy
+
 building:
   stage: build
   script:
     - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
     - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
-    - cd $GOPATH/src/$REPO_NAME
+    - ls -la $GOPATH/src/ # Tambahkan baris ini untuk mencetak isi direktori $GOPATH/src
+    - cd $GOPATH/src/$REPO_NAME || exit  # Tambahkan 'exit' untuk menghentikan eksekusi jika perpindahan direktori gagal
+    - pwd  # Tambahkan baris ini untuk mencetak direktori saat ini
     - GOOS=linux GOARCH=amd64 go build -ldflags '-linkmode external -w -extldflags "-static"' -o ${PROJECT_NAME}
     - echo "Builded"
   only:
