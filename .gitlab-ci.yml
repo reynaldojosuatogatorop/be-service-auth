@@ -5,12 +5,12 @@ variables:
   GO111MODULE: "on"
 
 before_script:
-  - go mod tidy
+  - go mod download
 
 build:
   stage: build
   script:
-    - go build -o be-service-auth main.go
+    - go build -o app main.go
   artifacts:
     paths:
       - app
