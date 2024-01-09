@@ -17,7 +17,7 @@ services:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_DATABASE: auth
+      MYSQL_DATABASE: auth,product
     ports:
       - "3306:3306"
     networks:
@@ -99,6 +99,7 @@ services:
       - SERVER_GRPCPORT=58882
       - SERVER_BASEPATH=
       - SERVER_SESSIONEXPIRE=3600
+      - SERVER_RATE_USD_TO_IDR=15000
       - DATABASE_HOST=mariadb
       - DATABASE_PORT=3306
       - DATABASE_DATABASE=product
