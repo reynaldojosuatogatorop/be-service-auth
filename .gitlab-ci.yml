@@ -1,26 +1,16 @@
-variables:
-  PROJECT_NAME: be-service-auth
-  REPO_NAME: gitlab.com/luru-norton/be-service-auth.git
-  SSH_HOST: ${SSH_HOST_DEV}
-  SSH_USER: ${SSH_USER_DEV}
-  SSH_PRIVATE_KEY: ${SSH_PRIVATE_KEY_DEV}
-
 stages:
   - build
 
-building:
+variables:
+  GO111MODULE: "on"
+
+before_script:
+  - go mod tidy
+
+build:
   stage: build
   script:
-    - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
-    - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
-    - ls -la $GOPATH/src/ # Tambahkan baris ini untuk mencetak isi direktori $GOPATH/src
-    - cd $GOPATH/src/$REPO_NAME || exit  # Tambahkan 'exit' untuk menghentikan eksekusi jika perpindahan direktori gagal
-    - pwd  # Tambahkan baris ini untuk mencetak direktori saat ini
-    - GOOS=linux GOARCH=amd64 go build -ldflags '-linkmode external -w -extldflags "-static"' -o ${PROJECT_NAME}
-    - echo "Builded"
-  only:
-    - dev
+    - go build -o be-service-auth app/main.go
   artifacts:
     paths:
-      - ${PROJECT_NAME}
-    expire_in: 5 min
+      - app
