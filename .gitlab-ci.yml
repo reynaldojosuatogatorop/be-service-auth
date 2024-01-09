@@ -10,7 +10,7 @@ before_script:
 build:
   stage: build
   script:
-    - go build -o be-service-auth app/main.go
+    - go build -o be-service-auth main.go
   artifacts:
     paths:
       - app
