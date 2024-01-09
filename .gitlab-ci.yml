@@ -1,21 +1,35 @@
-stages:
-  - build
-
 variables:
-  GO111MODULE: "on"
-  GO_VERSION: "1.20"
+  PROJECT_NAME: be-service-auth
+  REPO_NAME: https://gitlab.com/luru-norton/be-service-auth.git
+  #GIT_SUBMODULE_STRATEGY: recursive
 
-before_script:
-  - apt-get update -qy
-  - apt-get install -y golang-${GO_VERSION}
-  - go version
-
-build:
-  stage: build
-  script:
-    - go mod download
-    - go mod tidy
-    - go build -o app main.go
-  artifacts:
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  cache:
     paths:
-      - app
+      - .go/pkg/mod/
+
+stages:
+  # - test
+  - build
+  - deploy
+
+# ... (Bagian lain dari konfigurasi)
+
+build-old:
+  stage: build
+  cache:
+    key: ${PROJECT_NAME}
+    paths:
+      - ${PROJECT_NAME}
+  script:
+    - pwd
+    - make build
+    - echo "Built"
+  only:
+    - dev
+  tags:
+    - ssh
+
+# ... (Bagian lain dari konfigurasi)
