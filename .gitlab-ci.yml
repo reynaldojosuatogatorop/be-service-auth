@@ -1,6 +1,6 @@
 variables:
   PROJECT_NAME: be-service-auth
-  REPO_NAME: https://gitlab.com/luru-norton/be-service-auth.git
+  REPO_NAME: gitlab.com/luru-norton/be-service-auth.git
   #GIT_SUBMODULE_STRATEGY: recursive
 
 .go-cache:
