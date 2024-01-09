@@ -5,11 +5,15 @@ variables:
   GO111MODULE: "on"
 
 before_script:
-  - go mod tidy
+  - apt-get update -qy  # Mengupdate paket pada environment Docker
+  - apt-get install -y golang  # Menginstal Golang
+
+  - go mod download
 
 build:
   stage: build
   script:
+    - go mod tidy
     - go build -o app main.go
   artifacts:
     paths:
