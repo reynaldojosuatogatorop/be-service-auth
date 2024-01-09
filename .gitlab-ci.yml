@@ -1,6 +1,6 @@
 variables:
   PROJECT_NAME: be-service-auth
-  REPO_NAME: gitlab.com/luru-norton/be-service-auth
+  REPO_NAME: gitlab.com/luru-norton/be-service-auth.git
   SSH_HOST: ${SSH_HOST_DEV}
   SSH_USER: ${SSH_USER_DEV}
   SSH_PRIVATE_KEY: ${SSH_PRIVATE_KEY_DEV}
