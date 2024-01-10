@@ -1,21 +1,46 @@
+variables:
+  PROJECT_NAME: be-service-auth
+  REPO_NAME: gitlab.com/luru-norton/be-service-auth.git
+
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  cache:
+    paths:
+      - .go/pkg/mod/
+
 stages:
   - build
-
-variables:
-  GO111MODULE: "on"
-  GO_VERSION: "1.20"
-
-before_script:
-  - apt-get update -qy
-  - apt-get install -y golang-${GO_VERSION}
-  - go version
+  - deploy
 
 build:
   stage: build
   script:
-    - go mod download
-    - go mod tidy
-    - go build -o app main.go
-  artifacts:
+    - pwd
+    - make build  # Gantilah dengan perintah build sesuai dengan makefile Anda
+    - echo "Built"
+  only:
+    - dev
+  tags:
+    - ssh
+
+deploy:
+  stage: deploy
+  dependencies:
+    - build
+  cache:
+    key: ${PROJECT_NAME}
     paths:
-      - app
+      - ${PROJECT_NAME}
+  script:
+    - ls -la
+    #- cp api-specification/openapi.yaml /var/www/html/swagger-ui/openapi-insurance-auth.yaml
+    - cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
+    - systemctl stop ${PROJECT_NAME}
+    - cp ${PROJECT_NAME} /usr/local/bin/${PROJECT_NAME}
+    - systemctl start ${PROJECT_NAME}
+    - echo "Deployed"
+  only:
+    - dev
+  tags:
+    - ssh
