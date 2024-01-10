@@ -27,8 +27,13 @@ build:
 deploy:
   stage: deploy
   script:
-    # Tambahkan langkah-langkah deploy sesuai dengan kebutuhan Anda
-    - echo "Deploying..."
+    - ls -la
+    #- cp api-specification/openapi.yaml /var/www/html/swagger-ui/openapi-insurance-auth.yaml
+    - cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
+    - systemctl stop ${PROJECT_NAME}
+    - cp ${PROJECT_NAME} /usr/local/bin/${PROJECT_NAME}
+    - systemctl start ${PROJECT_NAME}
+    - echo "Deployed"
   only:
     - dev
   tags:
