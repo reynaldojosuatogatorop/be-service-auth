@@ -1,7 +1,6 @@
 variables:
   PROJECT_NAME: be-service-auth
   REPO_NAME: gitlab.com/luru-norton/be-service-auth.git
-  #GIT_SUBMODULE_STRATEGY: recursive
 
 .go-cache:
   variables:
@@ -11,23 +10,26 @@ variables:
       - .go/pkg/mod/
 
 stages:
-  # - test
   - build
   - deploy
 
-build-old:
+build:
   stage: build
-  cache:
-    key: ${PROJECT_NAME}
-    paths:
-      - ${PROJECT_NAME}
   script:
     - pwd
-    - make build
+    - make build  # Gantilah dengan perintah build sesuai dengan makefile Anda
     - echo "Built"
   only:
     - dev
   tags:
     - ssh
 
-# ... (Bagian lain dari konfigurasi)
+deploy:
+  stage: deploy
+  script:
+    # Tambahkan langkah-langkah deploy sesuai dengan kebutuhan Anda
+    - echo "Deploying..."
+  only:
+    - dev
+  tags:
+    - ssh
