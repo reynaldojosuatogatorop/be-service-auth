@@ -26,6 +26,12 @@ build:
 
 deploy:
   stage: deploy
+  dependencies:
+    - build
+  cache:
+    key: ${PROJECT_NAME}
+    paths:
+      - ${PROJECT_NAME}
   script:
     - ls -la
     #- cp api-specification/openapi.yaml /var/www/html/swagger-ui/openapi-insurance-auth.yaml
