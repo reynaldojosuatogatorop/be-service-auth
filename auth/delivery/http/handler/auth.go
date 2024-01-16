@@ -3,16 +3,23 @@ package handler
 import (
 	"be-service-auth/domain"
 	"be-service-auth/helper"
+	"context"
 	"errors"
+	"io"
+	"strings"
+
+	nethttp "net/http"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/labstack/gommon/log"
 	"github.com/valyala/fasthttp"
 )
 
 type AuthHandler struct {
-	AuthUseCase domain.AuthUseCase
+	AuthUseCase  domain.AuthUseCase
+	OAuthUseCase domain.OAuthUseCase
 }
 
 func (ah *AuthHandler) authorizationAuth(c *fiber.Ctx) (resAuth domain.ResponseLoginDTO, err error) {
@@ -118,6 +125,38 @@ func (ah *AuthHandler) Auth(c *fiber.Ctx) (err error) {
 	return c.Status(200).JSON(session)
 }
 
+func (ah *AuthHandler) OAuth2(c *fiber.Ctx) (err error) {
+	return
+}
+
+func (ah *AuthHandler) PostTokenOAuth2(w nethttp.ResponseWriter, r *nethttp.Request) {
+	var ctx context.Context
+	// Generate Credential OAUTH2
+	CredentialValues, _ := helper.GenerateOAuthCredential(ctx, r)
+
+	log.Info(CredentialValues)
+
+	// Data baru yang ingin ditambahkan ke tubuh permintaan
+	newPayloadData := "&client_id=" + CredentialValues.ClientID + "&client_secret=" + CredentialValues.ClientSecret
+
+	existingBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Error("Error reading existing request body:", err)
+		return
+	}
+	// r.Body.Close()
+
+	// Menggabungkan data lama dan data baru
+	newRequestBody := append(existingBody, []byte(newPayloadData)...)
+
+	// Membuat ulang tubuh permintaan dengan data yang diperbarui
+	r.Body = io.NopCloser(strings.NewReader(string(newRequestBody)))
+
+	responseToken := ah.OAuthUseCase.TokenOAuth(ctx, w, r)
+	if responseToken != nil {
+		log.Error(responseToken.Error())
+	}
+}
 func (ah *AuthHandler) Logout(c *fiber.Ctx) (err error) {
 	// var sessionData domain.ResponseSessionLogin
 	session := c.Locals("session")
@@ -134,4 +173,25 @@ func (ah *AuthHandler) Logout(c *fiber.Ctx) (err error) {
 	}
 
 	return helper.HttpSimpleResponse(c, fasthttp.StatusOK)
+}
+
+func (ah *AuthHandler) TokenOauth() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+
+		httpReq, err := adaptor.ConvertRequest(c, false)
+		if err != nil {
+			return err
+		}
+
+		err = ah.OAuthUseCase.ValidateBarrerToken(c.Context(), httpReq)
+
+		log.Print(err)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(err.Error())
+		}
+
+		c.Locals("isPartner", true)
+
+		return c.Next()
+	}
 }

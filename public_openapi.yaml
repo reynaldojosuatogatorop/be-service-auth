@@ -1,0 +1,98 @@
+openapi: 3.0.0
+info:
+  title: Public Open API for Auth Luru Norton Backend
+  description: Public Open API for Auth Luru Norton Backend
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8882
+    description: "local development"
+  - url: https://nortonweb.luru.space/api/v1/auth
+    description: "staging development"
+
+paths:
+  /oauth2:
+    get:
+      summary: Authenticate User with Bearer Token
+      description: Authenticate user using a bearer token
+      tags:
+        - Authentication & Authorization
+      security:
+        - OAuth2ClientCredentials:
+          - write_clients
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseSuccessAuth'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorized'
+
+
+components:
+  schemas:
+    RequestLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          description: User's email address
+        password:
+          type: string
+          description: User's password
+      required:
+        - email
+        - password
+    ResponseSuccess:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: 1
+        token:
+          type: string
+          example: "i1u29ijdbabd9qu82i1313axxjq29n"
+        expired:
+          type: string
+          example: "2023-09-10 22:00"
+    ErrorBadRequest:
+      type: object
+      example: Bad request
+    ErrorUnauthorized:
+      type: object
+      example: Unauthorized request
+    ErrorNotFound:
+      type: object
+      example: DATA NOT FOUND
+    ResponseSuccessAuth:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: 1
+        email:
+          type: string
+          example: "admin@gmail.com"
+        role:
+          type: string
+          example: "pusat"
+        expired:
+          type: string
+          example: 2023-09-10 22:00
+  securitySchemes:
+    OAuth2ClientCredentials:
+      type: oauth2
+      description: |-  
+        API ini menggunakan OAuth 2.0 dengan flow **Client Credential**. 
+        Untuk informasi lebih lanjut bisa pelajari https://www.ory.sh/docs/oauth2-oidc/client-credentials
+      flows:
+        clientCredentials:
+          tokenUrl: /b2b/token
+          scopes:
+            write_clients: modify clients

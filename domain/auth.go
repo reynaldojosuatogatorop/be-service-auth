@@ -18,7 +18,6 @@ type ResponseLoginDTO struct {
 	Token           string    `redis:"token" json:"token"`
 	ExpiredDatetime time.Time `redis:"expired_datetime" json:"expired_datetime"`
 }
-
 type AuthUseCase interface {
 	Login(ctx context.Context, request LoginRequestDTO) (response ResponseLoginDTO, err error)
 	AuthorizeAuth(ctx context.Context, request string) (response ResponseLoginDTO, err error)

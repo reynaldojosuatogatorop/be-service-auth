@@ -1,0 +1,9 @@
+CREATE TABLE oauth (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id VARCHAR(255) NOT NULL,
+    secret_key VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    domain varchar(50) NOT NULL,
+    dtm_crt TIMESTAMP NOT NULL DEFAULT NOW(),
+    dtm_upd TIMESTAMP NOT NULL DEFAULT NOW()
+);
