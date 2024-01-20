@@ -3,47 +3,18 @@ name: CI/CD
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    env:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      PROJECT_NAME: be-service-auth
-      REPO_NAME: gitlab.com/luru-norton/be-service-auth.git
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: '1.20'
-
-      - name: Build
-        run: |
-          make build
-          echo "Built"
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
-    env:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      PROJECT_NAME: be-service-auth
-  
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-  
-      - name: Deploy
+
+      - name: Configure SSH Key
+        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy to EC2
         run: |
-          ls -la
-          sudo mkdir -p /usr/local/etc/${PROJECT_NAME}-migration
-          sudo cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
-          # Jangan perlu membuat direktori /usr/local/bin/${PROJECT_NAME}
-          sudo cp ${GITHUB_WORKSPACE} /usr/local/bin/${PROJECT_NAME}  # Sesuaikan dengan lokasi file build
-          sudo systemctl start ${PROJECT_NAME}
-          echo "Deployed"
+          ssh -i ~/.ssh/id_rsa ec2-user@your-ec2-instance-ip "cd /path/to/your/app && git pull origin main && make build && sudo systemctl restart your-app"
