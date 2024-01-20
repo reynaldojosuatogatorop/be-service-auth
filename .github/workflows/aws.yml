@@ -11,10 +11,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-
-      - name: Configure SSH Key
-        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
-
+        
       - name: Deploy to EC2
         run: |
           ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@ec2-54-255-87-252.ap-southeast-1.compute.amazonaws.com "sudo systemctl restart be-service-auth"
