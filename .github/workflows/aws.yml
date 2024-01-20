@@ -42,6 +42,7 @@ jobs:
         run: |
           ls -la
           # cp api-specification/openapi.yaml /var/www/html/swagger-ui/openapi-insurance-auth.yaml
+          sudo mkdir -p /usr/local/etc/${PROJECT_NAME}-migration
           sudo cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
           sudo systemctl stop ${PROJECT_NAME}
           sudo cp ${PROJECT_NAME} /usr/local/bin/${PROJECT_NAME}
