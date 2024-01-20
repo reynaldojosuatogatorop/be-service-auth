@@ -44,6 +44,6 @@ jobs:
           sudo mkdir -p /usr/local/etc/${PROJECT_NAME}-migration
           sudo cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
           # Jangan perlu membuat direktori /usr/local/bin/${PROJECT_NAME}
-          sudo cp ${GITHUB_WORKSPACE}/be-service-auth /usr/local/bin/${PROJECT_NAME}  # Sesuaikan dengan lokasi file build
+          sudo cp ${GITHUB_WORKSPACE} /usr/local/bin/${PROJECT_NAME}  # Sesuaikan dengan lokasi file build
           sudo systemctl start ${PROJECT_NAME}
           echo "Deployed"
