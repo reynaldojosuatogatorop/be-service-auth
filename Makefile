@@ -20,7 +20,8 @@ build:
 	# protoc --go_out=saksi/delivery/grpc/auth --go_opt=paths=source_relative --go-grpc_out=saksi/delivery/grpc/auth --go-grpc_opt=paths=source_relative --proto_path=saksi/delivery/grpc/proto grpc.proto
 	# protoc --plugin=protoc-gen-doc=${HOME}/go/bin/protoc-gen-doc --doc_out=saksi/delivery/http/grpcdoc --doc_opt=saksi/delivery/http/grpcdoc/html.tmpl,index.html --proto_path=saksi/delivery/http/grpcdoc grpc.proto
 	go mod tidy
-	go build -o ${NAME} app/*.go
+	go mod vendor
+	go build -o be-service-auth -mod=readonly app/*.go
 
 clean:
 	if [ -f saksi/delivery/http/openapi/openapi.yaml ] ; then rm saksi/delivery/http/openapi/openapi.yaml ; fi
