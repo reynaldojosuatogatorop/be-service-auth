@@ -11,7 +11,6 @@ jobs:
     env:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       PROJECT_NAME: be-service-auth
-      REPO_NAME: gitlab.com/luru-norton/be-service-auth.git
 
     steps:
       - name: Checkout Repository
@@ -35,16 +34,12 @@ jobs:
       PROJECT_NAME: be-service-auth
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
       - name: Deploy
         run: |
           ls -la
-          # cp api-specification/openapi.yaml /var/www/html/swagger-ui/openapi-insurance-auth.yaml
           sudo mkdir -p /usr/local/etc/${PROJECT_NAME}-migration
           sudo cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
-          # sudo systemctl stop ${PROJECT_NAME}
+          sudo systemctl stop ${PROJECT_NAME} || true  # Stop service if running (ignore errors if not running)
           sudo mkdir -p /usr/local/bin/${PROJECT_NAME}
           sudo cp ${PROJECT_NAME} /usr/local/bin/${PROJECT_NAME}
 
@@ -53,5 +48,5 @@ jobs:
           chmod 600 /tmp/id_rsa
 
           # Example using SSH key to connect to the EC2 instance
-          ssh -i /tmp/id_rsa ec2-user@your-ec2-instance-ip "sudo systemctl start ${PROJECT_NAME}"
+          ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa ec2-user@your-ec2-instance-ip "sudo systemctl start ${PROJECT_NAME}"
           echo "Deployed"
