@@ -1,0 +1,55 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      PROJECT_NAME: be-service-auth
+      REPO_NAME: gitlab.com/luru-norton/be-service-auth.git
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - name: Build
+        run: |
+          make build  # Gantilah dengan perintah build sesuai dengan makefile Anda
+          echo "Built"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      PROJECT_NAME: be-service-auth
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Deploy
+        run: |
+          ls -la
+          # cp api-specification/openapi.yaml /var/www/html/swagger-ui/openapi-insurance-auth.yaml
+          cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
+          sudo systemctl stop ${PROJECT_NAME}
+          sudo cp ${PROJECT_NAME} /usr/local/bin/${PROJECT_NAME}
+
+          # Create temporary file for SSH private key
+          echo "${SSH_PRIVATE_KEY}" > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
+
+          # Example using SSH key to connect to the EC2 instance
+          ssh -i /tmp/id_rsa ec2-user@your-ec2-instance-ip "sudo systemctl start ${PROJECT_NAME}"
+          echo "Deployed"
