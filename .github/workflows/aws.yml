@@ -37,8 +37,8 @@ jobs:
       - name: Deploy
         run: |
           ls -la
-          sudo mkdir -p /usr/local/etc/${PROJECT_NAME}-migration
-          sudo cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
+          # sudo mkdir -p /usr/local/etc/${PROJECT_NAME}-migration
+          cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
           sudo systemctl stop ${PROJECT_NAME} || true  # Stop service if running (ignore errors if not running)
           sudo mkdir -p /usr/local/bin/${PROJECT_NAME}
           sudo cp ${PROJECT_NAME} /usr/local/bin/${PROJECT_NAME}
