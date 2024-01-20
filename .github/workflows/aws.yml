@@ -17,4 +17,4 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@ec2-54-255-87-252.ap-southeast-1.compute.amazonaws.com "sudo systemctl restart be-service-auth"
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@ec2-54-255-87-252.ap-southeast-1.compute.amazonaws.com "sudo systemctl restart be-service-auth"
