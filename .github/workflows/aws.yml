@@ -1,4 +1,4 @@
-name: CI/CD
+name: Deploy to AWS
 
 on:
   push:
@@ -26,9 +26,14 @@ jobs:
   deploy:
     needs: build
     runs-on: self-hosted
-
+    env:
+      PROJECT_NAME: be-service-auth
     steps:
       - name: Deploy
         run: |
+          ls -la
+          cp db/migration/* /usr/local/etc/${PROJECT_NAME}-migration
+          sudo systemctl stop ${PROJECT_NAME}
+          sudo cp ${PROJECT_NAME} /usr/local/bin/${PROJECT_NAME}
           echo "Deploying..."
           # Add your deployment steps here
