@@ -29,6 +29,9 @@ jobs:
     env:
       PROJECT_NAME: be-service-auth
     steps:
+      - name: Start GitLab Runner
+        run: sudo gitlab-runner start
+        
       - name: Deploy
         run: |
           ls -la
